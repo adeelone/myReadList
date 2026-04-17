@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Read List</title>
+  <link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+  <main class="page">
+    <section class="hero">
+      <p class="eyebrow">NovelFire Library Viewer</p>
+      <h1>Upload your CSV and browse your full read list.</h1>
+      <p class="subtitle">
+        Import the CSV exported from your NovelFire library script. The site renders a readable list with title,
+        author, chapter count, reading progress, and quick links.
+      </p>
+    </section>
+
+    <section class="panel uploader">
+      <div class="uploader-copy">
+        <h2>Import CSV</h2>
+        <p>Use the exported CSV from your library tool. Nothing leaves your browser.</p>
+      </div>
+      <label class="file-drop" for="csvFile">
+        <input id="csvFile" type="file" accept=".csv,text/csv">
+        <span class="file-title">Choose CSV</span>
+        <span class="file-hint">or drag and drop it here</span>
+      </label>
+      <div class="toolbar">
+        <input id="searchInput" type="search" placeholder="Search title or author">
+        <select id="sortSelect">
+          <option value="title-asc">Title A-Z</option>
+          <option value="title-desc">Title Z-A</option>
+          <option value="progress-desc">Most Read</option>
+          <option value="progress-asc">Least Read</option>
+          <option value="chapters-desc">Most Chapters</option>
+          <option value="chapters-asc">Fewest Chapters</option>
+        </select>
+        <button id="clearBtn" type="button">Clear</button>
+      </div>
+    </section>
+
+    <section class="stats" id="stats">
+      <article class="stat-card">
+        <span class="stat-label">Books</span>
+        <strong id="statBooks">0</strong>
+      </article>
+      <article class="stat-card">
+        <span class="stat-label">Chapters Read</span>
+        <strong id="statRead">0</strong>
+      </article>
+      <article class="stat-card">
+        <span class="stat-label">Total Chapters</span>
+        <strong id="statTotal">0</strong>
+      </article>
+      <article class="stat-card">
+        <span class="stat-label">Average Progress</span>
+        <strong id="statAverage">0%</strong>
+      </article>
+    </section>
+
+    <section class="panel empty-state" id="emptyState">
+      <h2>No CSV loaded</h2>
+      <p>Upload `novelfire-read-list-all-pages.csv` to populate the site.</p>
+    </section>
+
+    <section class="results hidden" id="results">
+      <div class="section-header">
+        <h2>Readable List</h2>
+        <p id="resultsCount">0 entries</p>
+      </div>
+      <div class="card-grid" id="cardGrid"></div>
+
+      <div class="section-header table-header">
+        <h2>Table View</h2>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Title</th>
+              <th>Author</th>
+              <th>Chapters</th>
+              <th>Read</th>
+              <th>Progress</th>
+              <th>Book</th>
+              <th>Last Chapter</th>
+            </tr>
+          </thead>
+          <tbody id="tableBody"></tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+
+  <script src="./app.js"></script>
+</body>
+</html>
