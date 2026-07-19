@@ -28,7 +28,7 @@ This is the best option if you do not want to paste code again.
 
 1. Install the Tampermonkey browser extension.
 2. Create a new userscript in Tampermonkey.
-3. Replace its contents with [novelfire-readlist.user.js](C:\Users\adeem\OneDrive\Desktop\gen_proj'\myReadList\novelfire-readlist.user.js).
+3. Replace its contents with [novelfire-readlist.user.js](novelfire-readlist.user.js).
 4. Save it.
 5. Open `https://novelfire.net/account/library` while logged in.
 6. Click the floating `Export Read List` button.
@@ -44,7 +44,7 @@ The userscript will:
 
 1. Create a new bookmark in your browser.
 2. Name it `NovelFire Read List`.
-3. Copy the contents of [novelfire-readlist.bookmarklet.txt](C:\Users\adeem\OneDrive\Desktop\gen_proj'\myReadList\novelfire-readlist.bookmarklet.txt) into the bookmark URL field.
+3. Copy the contents of [novelfire-readlist.bookmarklet.txt](novelfire-readlist.bookmarklet.txt) into the bookmark URL field.
 4. While logged into `https://novelfire.net/account/library`, click that bookmark.
 
 ## Manual fallback
@@ -53,7 +53,7 @@ The userscript will:
 2. Open `https://novelfire.net/account/library`.
 3. Open Developer Tools in your browser.
 4. Go to the `Console` tab.
-5. Open [novelfire-readlist.js](C:\Users\adeem\OneDrive\Desktop\gen_proj'\myReadList\novelfire-readlist.js), copy the whole file, and paste it into the console.
+5. Open [novelfire-readlist.js](novelfire-readlist.js), copy the whole file, and paste it into the console.
 6. Press Enter.
 
 ## Result
@@ -70,7 +70,7 @@ You can:
 
 After you export the CSV, you can open the local site and import it for a cleaner reading view.
 
-1. Open [index.html](</C:\Users\adeem\OneDrive\Desktop\gen_proj'\myReadList\index.html>) in your browser.
+1. Open [index.html](index.html) in your browser.
 2. Upload the exported CSV file.
 3. Use search and sorting to browse the list.
 
