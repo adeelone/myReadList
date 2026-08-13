@@ -1,99 +1,135 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>My Read List</title>
-  <link rel="stylesheet" href="./styles.css">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Novel Phoenix - a public NovelFire reading library, progress tracker, and reading history.">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <meta name="color-scheme" content="light dark">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; connect-src 'self'; img-src 'self' data:; font-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; upgrade-insecure-requests">
+  <meta property="og:title" content="Novel Phoenix">
+  <meta property="og:description" content="A public reading library with current progress, last-read chapters, and reading history.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://adeelone.github.io/myReadList/">
+  <title>Novel Phoenix</title>
+  <link rel="canonical" href="https://adeelone.github.io/myReadList/">
+  <link rel="icon" href="./favicon.svg" type="image/svg+xml">
+  <link rel="manifest" href="./manifest.webmanifest">
+  <script src="./theme-boot.js?v=2.0.0"></script>
+  <link rel="stylesheet" href="./styles.css?v=2.0.0">
 </head>
 <body>
+  <header class="site-header">
+    <a class="brand" href="#library" aria-label="Novel Phoenix home"><span class="brand-mark" aria-hidden="true">P</span><span>Novel Phoenix</span></a>
+    <nav aria-label="Primary navigation">
+      <button class="nav-link active" data-view="library">Library</button>
+      <button class="nav-link" data-view="history">History</button>
+      <button class="nav-link" data-view="imports">Imports</button>
+    </nav>
+    <div class="header-actions">
+      <button class="theme-trigger" id="themeButton" type="button" aria-label="Appearance" aria-expanded="false" aria-controls="themePanel">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v2m0 14v2M3 12h2m14 0h2M5.64 5.64l1.42 1.42m9.88 9.88 1.42 1.42m0-12.72-1.42 1.42M7.06 16.94l-1.42 1.42M16 12a4 4 0 1 1-8 0 4 4 0 0 1 8 0Z"/></svg>
+        <span>Appearance</span>
+      </button>
+      <button class="button primary import-action" id="importButton"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 16V4m0 0L7.5 8.5M12 4l4.5 4.5M5 14v5h14v-5"/></svg><span>Import snapshot</span></button>
+      <section class="theme-panel hidden" id="themePanel" aria-label="Appearance settings">
+        <div class="theme-panel-head"><div><h2>Appearance</h2><p>Saved separately for each mode.</p></div><button id="closeTheme" type="button" aria-label="Close appearance settings">×</button></div>
+        <div class="mode-switch" aria-label="Color mode">
+          <button type="button" data-mode-choice="light">Light</button>
+          <button type="button" data-mode-choice="dark">Dark</button>
+        </div>
+        <fieldset>
+          <legend>Background</legend>
+          <div class="color-swatches" id="backgroundSwatches"></div>
+          <label class="custom-color"><span>Custom background</span><input id="backgroundColor" type="color" aria-label="Custom background color"></label>
+        </fieldset>
+        <fieldset>
+          <legend>Accent</legend>
+          <div class="color-swatches" id="accentSwatches"></div>
+          <label class="custom-color"><span>Custom accent</span><input id="accentColor" type="color" aria-label="Custom accent color"></label>
+        </fieldset>
+        <button class="reset-theme" id="resetTheme" type="button">Reset this mode</button>
+      </section>
+    </div>
+    <input id="csvFile" type="file" accept=".csv,text/csv" hidden>
+  </header>
+
   <main class="page">
-    <section class="hero">
-      <p class="eyebrow">NovelFire Library Viewer</p>
-      <h1>Upload your CSV and browse your full read list.</h1>
-      <p class="subtitle">
-        Import the CSV exported from your NovelFire library script. The site renders a readable list with title,
-        author, chapter count, reading progress, and quick links.
-      </p>
+    <div class="data-status" id="dataStatus" role="status">Loading public library...</div>
+    <section id="libraryView" class="view">
+      <div class="summary" aria-label="Library summary">
+        <div><span>Total novels</span><strong id="statBooks">0</strong><small>in the library</small></div>
+        <div><span>Chapters read</span><strong id="statRead">0</strong><small>across all novels</small></div>
+        <div><span>Average progress</span><strong id="statAverage">0%</strong><small>of available chapters</small></div>
+      </div>
+
+      <section class="last-read-section">
+        <div class="section-heading"><h1>Last read</h1><p id="lastReadTime">No reading activity yet</p></div>
+        <article class="last-read" id="lastReadCard">
+          <div class="book-glyph" aria-hidden="true">P</div>
+          <div class="last-title"><h2>Import your NovelFire library</h2><p>Your most recently advanced novel will appear here.</p></div>
+          <div class="last-detail"><span>Last chapter</span><strong>—</strong><small>—</small></div>
+          <div class="last-detail"><span>Progress</span><strong>—</strong><small>—</small></div>
+          <div class="last-actions"></div>
+        </article>
+      </section>
+
+      <section class="library-section">
+        <div class="section-heading"><h1>Library</h1><p id="resultsCount">0 novels</p></div>
+        <div class="controls">
+          <label class="search"><span aria-hidden="true">⌕</span><input id="searchInput" type="search" placeholder="Search your library" aria-label="Search your library"></label>
+          <select id="sortSelect" aria-label="Sort library">
+            <option value="updated-desc">Recently read</option>
+            <option value="progress-desc">Most progress</option>
+              <option value="title-asc">Title A-Z</option>
+              <option value="title-desc">Title Z-A</option>
+          </select>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Novel</th><th>Author</th><th>Progress</th><th>Last read</th><th>Links</th></tr></thead>
+            <tbody id="tableBody"></tbody>
+          </table>
+          <div class="empty" id="emptyState">
+            <h2>The public shelf is ready.</h2>
+            <p>There is no published snapshot yet. Import a CSV to preview the library privately in this browser, then publish the generated data file.</p>
+            <button class="button secondary" id="emptyImportButton">Choose CSV</button>
+          </div>
+        </div>
+      </section>
     </section>
 
-    <section class="panel uploader">
-      <div class="uploader-copy">
-        <h2>Import CSV</h2>
-        <p>Use the exported CSV from your library tool. Nothing leaves your browser.</p>
-      </div>
-      <label class="file-drop" for="csvFile">
-        <input id="csvFile" type="file" accept=".csv,text/csv">
-        <span class="file-title">Choose CSV</span>
-        <span class="file-hint">or drag and drop it here</span>
-      </label>
-      <div class="toolbar">
-        <input id="searchInput" type="search" placeholder="Search title or author">
-        <select id="sortSelect">
-          <option value="title-asc">Title A-Z</option>
-          <option value="title-desc">Title Z-A</option>
-          <option value="progress-desc">Most Read</option>
-          <option value="progress-asc">Least Read</option>
-          <option value="chapters-desc">Most Chapters</option>
-          <option value="chapters-asc">Fewest Chapters</option>
-        </select>
-        <button id="clearBtn" type="button">Clear</button>
-      </div>
+    <section id="historyView" class="view hidden">
+      <div class="page-title"><h1>Reading history</h1><p>Progress recorded when a newer snapshot moves a novel forward.</p></div>
+      <div class="timeline" id="readingHistory"></div>
     </section>
 
-    <section class="stats" id="stats">
-      <article class="stat-card">
-        <span class="stat-label">Books</span>
-        <strong id="statBooks">0</strong>
-      </article>
-      <article class="stat-card">
-        <span class="stat-label">Chapters Read</span>
-        <strong id="statRead">0</strong>
-      </article>
-      <article class="stat-card">
-        <span class="stat-label">Total Chapters</span>
-        <strong id="statTotal">0</strong>
-      </article>
-      <article class="stat-card">
-        <span class="stat-label">Average Progress</span>
-        <strong id="statAverage">0%</strong>
-      </article>
-    </section>
-
-    <section class="panel empty-state" id="emptyState">
-      <h2>No CSV loaded</h2>
-      <p>Upload `novelfire-read-list-all-pages.csv` to populate the site.</p>
-    </section>
-
-    <section class="results hidden" id="results">
-      <div class="section-header">
-        <h2>Readable List</h2>
-        <p id="resultsCount">0 entries</p>
-      </div>
-      <div class="card-grid" id="cardGrid"></div>
-
-      <div class="section-header table-header">
-        <h2>Table View</h2>
-      </div>
-      <div class="table-wrap">
-        <table>
-          <thead>
-            <tr>
-              <th>Title</th>
-              <th>Author</th>
-              <th>Chapters</th>
-              <th>Read</th>
-              <th>Progress</th>
-              <th>Book</th>
-              <th>Last Chapter</th>
-            </tr>
-          </thead>
-          <tbody id="tableBody"></tbody>
-        </table>
+    <section id="importsView" class="view hidden">
+      <div class="page-title"><h1>Import history</h1><p>Every published or locally imported library snapshot, newest first.</p></div>
+      <div class="import-layout">
+        <div class="timeline" id="importHistory"></div>
+        <aside class="import-tools">
+          <label class="drop-zone" id="fileDrop" for="csvFile">
+            <strong>Drop a NovelFire CSV here</strong>
+            <span>or click to browse</span>
+            <small>Imports create a private draft in this browser.</small>
+          </label>
+          <div class="publish-notice" id="publishedNotice">
+            <strong>Public data is read-only here.</strong>
+            <p>Import a snapshot to preview an update before publishing it.</p>
+          </div>
+          <div class="draft-actions hidden" id="draftActions">
+            <strong>Local draft ready</strong>
+            <p>Download the sanitized public data file, or return to the currently published library.</p>
+            <button class="button primary" id="downloadDataButton" type="button">Download publish data</button>
+            <button class="text-button" id="clearDraftButton" type="button">Discard draft and show public site</button>
+          </div>
+        </aside>
       </div>
     </section>
   </main>
 
-  <script src="./app.js"></script>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <script type="module" src="./app.js?v=2.0.2"></script>
 </body>
 </html>

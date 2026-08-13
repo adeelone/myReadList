@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://adeelone.github.io/myReadList/sitemap.xml

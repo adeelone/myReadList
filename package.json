@@ -1,0 +1,20 @@
+{
+  "name": "novel-phoenix",
+  "version": "2.0.0",
+  "private": true,
+  "type": "module",
+  "description": "A public NovelFire reading library, progress tracker, and history.",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "dev": "node scripts/serve.mjs",
+    "test": "node tests/run.mjs",
+    "build": "node scripts/build.mjs",
+    "check": "npm test && npm run build && node --check novelfire-readlist.js && node --check novelfire-readlist.user.js",
+    "bookmarklet": "node scripts/bookmarklet.mjs",
+    "ingest": "node scripts/ingest.mjs",
+    "publish:snapshot": "node scripts/publish-snapshot.mjs"
+  },
+  "license": "MIT"
+}

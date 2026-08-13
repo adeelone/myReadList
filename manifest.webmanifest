@@ -1,0 +1,18 @@
+{
+  "name": "Novel Phoenix",
+  "short_name": "Novel Phoenix",
+  "description": "A public reading library with current progress and reading history.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#fdfdfc",
+  "theme_color": "#c83b12",
+  "icons": [
+    {
+      "src": "./favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}

@@ -1,89 +1,102 @@
-# NovelFire Read List
+# Novel Phoenix
 
-This folder contains a browser-side extractor for your NovelFire library.
+Novel Phoenix is a public NovelFire reading library. Visitors can see the current library, last-read chapter, reading progress, direct novel/chapter links, reading history, and import history. The owner can preview a CSV snapshot locally before publishing a sanitized public data file.
 
-## What it does
+Live site: <https://adeelone.github.io/myReadList/>
 
-When you run the script on `https://novelfire.net/account/library` while logged in, it collects your whole library across all pages and builds a readable list with:
+## Architecture
 
-- `Title`
-- `Author`
-- `Chapter amount`
-- `Chapters I have read`
-- `Last chapter title`
-- `Progress (%)`
+- The public site is a static GitHub Pages deployment.
+- Public reading data lives in `data/library.json` and is safe to cache, review, and version in Git.
+- Browser imports are local drafts stored under `novel-phoenix-v1`; they never overwrite the public site by themselves.
+- Import filenames are removed from published snapshots.
+- GitHub Actions runs tests, builds the static artifact, and deploys every push to `main`.
+- No database, server password, API key, analytics tracker, or browser-side admin token is required.
 
-## Files
+This repository-backed approach is deliberate: it makes public reads reliable and owner writes secure without exposing credentials in frontend code.
 
-- `novelfire-readlist.js`: the main multi-page extractor script.
-- `novelfire-readlist.bookmarklet.txt`: one-click bookmarklet code.
-- `novelfire-readlist.user.js`: Tampermonkey userscript that adds an `Export Read List` button on the library page.
-- `index.html`: local site for importing the exported CSV.
-- `styles.css`: styling for the local site.
-- `app.js`: CSV parsing and rendering logic for the local site.
+## Export from NovelFire
 
-## Recommended: Tampermonkey
+1. Install Tampermonkey.
+2. Create a userscript using `novelfire-readlist.user.js`.
+3. Open `https://novelfire.net/account/library` while signed in.
+4. Select **Export to Novel Phoenix**.
+5. Download the generated CSV.
 
-This is the best option if you do not want to paste code again.
+The exporter scans every library page, fetches author names, preserves NovelFire library order, records the export time, and includes direct novel and last-read chapter URLs. Legacy exports remain supported.
 
-1. Install the Tampermonkey browser extension.
-2. Create a new userscript in Tampermonkey.
-3. Replace its contents with [novelfire-readlist.user.js](novelfire-readlist.user.js).
-4. Save it.
-5. Open `https://novelfire.net/account/library` while logged in.
-6. Click the floating `Export Read List` button.
+## Publish a new snapshot
 
-The userscript will:
+### Recommended: one command
 
-- scan every library page
-- fetch each novel page to extract the author
-- show one combined table
-- let you copy JSON, copy CSV, or download CSV
+From this repository on `main`:
 
-## Alternative: Bookmarklet
+```powershell
+npm run publish:snapshot -- "C:\path\to\novel-phoenix-2026-08-12.csv"
+```
 
-1. Create a new bookmark in your browser.
-2. Name it `NovelFire Read List`.
-3. Copy the contents of [novelfire-readlist.bookmarklet.txt](novelfire-readlist.bookmarklet.txt) into the bookmark URL field.
-4. While logged into `https://novelfire.net/account/library`, click that bookmark.
+The command:
 
-## Manual fallback
+1. refuses to run when unrelated files are already staged;
+2. converts the CSV into sanitized public JSON;
+3. compares it with the current public snapshot and records forward progress;
+4. runs the automated tests and production build;
+5. commits only `data/library.json`;
+6. pushes `main`, which triggers the Pages deployment.
 
-1. Log into NovelFire.
-2. Open `https://novelfire.net/account/library`.
-3. Open Developer Tools in your browser.
-4. Go to the `Console` tab.
-5. Open [novelfire-readlist.js](novelfire-readlist.js), copy the whole file, and paste it into the console.
-6. Press Enter.
+### Browser-assisted alternative
 
-## Result
+1. Open the live site and choose **Import snapshot**.
+2. Review the local draft, history, links, and statistics.
+3. Open **Imports** and choose **Download publish data**.
+4. Replace `data/library.json` in this repository with the downloaded file.
+5. Commit and push the change to `main`.
 
-The script opens an overlay on the page and also prints a table in the browser console.
+Until step 5, only that browser sees the draft. Visitors continue seeing the last published snapshot.
 
-You can:
+## Appearance
 
-- copy JSON
-- copy CSV
-- download CSV
+Light and Dark modes each remember an independent background and accent palette. Curated paper, beige, mist, blush, charcoal, pitch-black, graphite, aubergine, orange, blue, purple, and green choices are included, along with custom color pickers. Supporting contrast is derived automatically.
 
-## Local Site
+## Local development
 
-After you export the CSV, you can open the local site and import it for a cleaner reading view.
+Requires Node.js 20 or newer.
 
-1. Open [index.html](index.html) in your browser.
-2. Upload the exported CSV file.
-3. Use search and sorting to browse the list.
+```powershell
+npm install
+npm run dev
+```
 
-The site shows:
+Open <http://127.0.0.1:4173/>. Use `?preview=1` for non-persistent representative data.
 
-- summary stats
-- a readable card view
-- a full table view
-- links back to the book page and last chapter
+Validation commands:
 
-## Notes
+```powershell
+npm test
+npm run build
+npm run check
+```
 
-- The public home page at `https://novelfire.net/home` does not expose your personal library.
-- Run this while logged into `https://novelfire.net/account/library`.
-- Author names are fetched from each novel page after the library pages are collected, so larger libraries may take a bit longer.
-- If NovelFire changes its HTML structure, the selectors may need a small update.
+The production build is written to `dist/`.
+
+## Privacy and security
+
+- CSV files are parsed locally; the site does not upload them to a server.
+- The public snapshot contains novel data, reading progress, links, and timestamps by design.
+- Local source filenames are removed before publication.
+- Only `http:` and `https:` links are accepted; unsafe URL schemes are discarded.
+- A restrictive Content Security Policy limits scripts, connections, images, and forms to the site itself.
+- Appearance preferences and local drafts remain in browser storage until cleared.
+
+See `SECURITY.md` for vulnerability reporting.
+
+## Project files
+
+- `index.html`, `styles.css`, `app.js`: production site.
+- `lib/core.js`: CSV parsing, validation, snapshot merging, and sanitization.
+- `data/library.json`: public reading data consumed by visitors.
+- `scripts/ingest.mjs`: convert a CSV into public data without committing.
+- `scripts/publish-snapshot.mjs`: validate, commit, and push one snapshot.
+- `novelfire-readlist.user.js`: recommended Tampermonkey exporter.
+- `novelfire-readlist.js`: developer-console fallback.
+- `.github/workflows/pages.yml`: CI and GitHub Pages deployment.

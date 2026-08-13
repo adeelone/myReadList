@@ -102,6 +102,7 @@
 
   const buildAndShowOverlay = (allItems) => {
     const seen = new Set();
+    const exportedAt = new Date().toISOString();
     const uniqueItems = allItems
       .filter((item) => {
         const key = `${item.title}::${item.bookUrl}`;
@@ -109,10 +110,10 @@
         seen.add(key);
         return true;
       })
-      .sort((a, b) => a.title.localeCompare(b.title));
+      .map((item, index) => ({ ...item, libraryOrder: index + 1, exportedAt }));
 
-    const csvHeader = ["Title", "Author", "Book URL", "Last chapter title", "Last chapter URL", "Chapters read", "Total chapters", "Progress (%)"];
-    const csv = [csvHeader, ...uniqueItems.map((row) => [row.title, row.author, row.bookUrl, row.chapterTitle, row.chapterUrl, row.chaptersRead, row.chapterAmount, row.progressPercent])]
+    const csvHeader = ["Title", "Author", "Book URL", "Last read chapter", "Last read URL", "Chapters read", "Total chapters", "Progress (%)", "Library order", "Exported at"];
+    const csv = [csvHeader, ...uniqueItems.map((row) => [row.title, row.author, row.bookUrl, row.chapterTitle, row.chapterUrl, row.chaptersRead, row.chapterAmount, row.progressPercent, row.libraryOrder, row.exportedAt])]
       .map((line) => line.map((cell) => `"${String(cell || "").replace(/"/g, '""')}"`).join(","))
       .join("\n");
     const json = JSON.stringify(uniqueItems, null, 2);
@@ -123,7 +124,7 @@
     overlay.innerHTML = `
       <div style="display:flex;justify-content:space-between;gap:16px;align-items:flex-start;margin-bottom:16px;">
         <div>
-          <div style="font-size:24px;font-weight:700;">NovelFire Read List</div>
+          <div style="font-size:24px;font-weight:700;">Novel Phoenix Export</div>
           <div style="color:#94a3b8;margin-top:4px;">Collected ${uniqueItems.length} entries from pages 1-${maxPage}.</div>
         </div>
         <div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end;">
@@ -176,7 +177,7 @@
       const blob = new Blob([csv], { type: "text/csv;charset=utf-8" });
       const link = document.createElement("a");
       link.href = URL.createObjectURL(blob);
-      link.download = "novelfire-read-list-all-pages.csv";
+      link.download = `novel-phoenix-${new Date().toISOString().slice(0, 10)}.csv`;
       document.body.appendChild(link);
       link.click();
       link.remove();
