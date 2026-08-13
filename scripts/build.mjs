@@ -12,6 +12,7 @@ const files = [
   "terms.html",
   "accessibility.html",
   "security.html",
+  "security.txt",
   "styles.css",
   "app.js",
   "theme-boot.js",

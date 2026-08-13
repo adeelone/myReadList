@@ -65,6 +65,7 @@ const legalFiles = await Promise.all(["privacy", "terms", "accessibility", "secu
 const pagesWorkflow = await readFile(new URL("../.github/workflows/pages.yml", import.meta.url), "utf8");
 const codeqlWorkflow = await readFile(new URL("../.github/workflows/codeql.yml", import.meta.url), "utf8");
 const securityText = await readFile(new URL("../.well-known/security.txt", import.meta.url), "utf8");
+const publicSecurityText = await readFile(new URL("../security.txt", import.meta.url), "utf8");
 
 test("site has production metadata and a restrictive CSP", () => {
   assert.match(index, /Content-Security-Policy/);
@@ -85,6 +86,9 @@ test("legal, accessibility, and security disclosures are published", () => {
   assert.match(index, /privacy\.html/);
   assert.match(index, /security\.html/);
   assert.match(securityText, /security\/advisories\/new/);
+  assert.match(publicSecurityText, /security\/advisories\/new/);
+  assert.match(publicSecurityText, /Canonical: https:\/\/adeelone\.github\.io\/myReadList\/security\.txt/);
+  assert.match(legalFiles[3], /\.\/security\.txt/);
 });
 
 test("deployment and security actions are immutable and least privilege", () => {
