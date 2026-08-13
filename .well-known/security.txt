@@ -1,0 +1,5 @@
+Contact: https://github.com/adeelone/myReadList/security/advisories/new
+Expires: 2027-08-12T23:59:59Z
+Preferred-Languages: en
+Canonical: https://adeelone.github.io/myReadList/.well-known/security.txt
+Policy: https://adeelone.github.io/myReadList/security.html

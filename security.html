@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; style-src-attr 'unsafe-inline'; connect-src 'self'; img-src 'self' data:; font-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'; frame-src 'none'; child-src 'none'; worker-src 'none'; media-src 'none'; manifest-src 'self'; upgrade-insecure-requests">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Security posture and reporting information for Novel Phoenix.">
+  <meta name="referrer" content="no-referrer">
+  <meta name="color-scheme" content="light dark">
+  <title>Security | Novel Phoenix</title>
+  <link rel="canonical" href="https://adeelone.github.io/myReadList/security.html">
+  <link rel="icon" href="./favicon.svg" type="image/svg+xml">
+  <script src="./theme-boot.js?v=2.1.0"></script>
+  <link rel="stylesheet" href="./styles.css?v=2.1.0">
+</head>
+<body>
+  <a class="skip-link" href="#main-content">Skip to content</a>
+  <header class="legal-header"><a class="brand" href="./"><span class="brand-mark" aria-hidden="true">P</span><span>Novel Phoenix</span></a><a href="./">Back to library</a></header>
+  <main class="legal-page" id="main-content">
+    <p class="legal-kicker">Security posture</p>
+    <h1>Small attack surface by design</h1>
+    <p class="legal-lead">Novel Phoenix is a static, read-only public site. It has no account system, backend API, database, payment processor, writable admin route, server secret, or browser-side deployment credential.</p>
+
+    <h2>Controls in place</h2>
+    <ul>
+      <li>HTTPS delivery through GitHub Pages and no mixed-content dependencies.</li>
+      <li>A default-deny Content Security Policy for scripts, connections, frames, objects, workers, media, and forms.</li>
+      <li>No third-party JavaScript, analytics, ads, remote fonts, or embedded content.</li>
+      <li>CSV size and row limits, normalized fields, escaped rendered text, and rejection of unsafe URL schemes.</li>
+      <li>Outbound links isolate the opener and suppress referrer data.</li>
+      <li>Published snapshots remove local filenames and never contain repository credentials.</li>
+      <li>Automated tests, production builds, CodeQL scanning, dependency updates, and least-privilege deployment permissions.</li>
+    </ul>
+
+    <h2>Hosting and firewall boundary</h2>
+    <p>GitHub operates the Pages hosting network, TLS termination, abuse controls, and infrastructure perimeter. This project has no origin server to expose. GitHub Pages does not let this repository configure a custom web application firewall or arbitrary HTTP response headers. A custom-domain WAF can be added later through a reverse proxy such as Cloudflare, but it is not represented as active today.</p>
+
+    <h2>Report a vulnerability</h2>
+    <p>Use GitHub's private security-advisory form. Include the affected URL or file, impact, reproduction steps, and a safe proof of concept. Do not post an unpatched vulnerability, credentials, cookies, private exports, or personal information in a public issue. Good-faith research that avoids privacy violations, service disruption, and data destruction is welcome.</p>
+    <div class="legal-actions"><a class="button primary" href="https://github.com/adeelone/myReadList/security/advisories/new" target="_blank" rel="noopener noreferrer" referrerpolicy="no-referrer">Report privately</a><a href="https://github.com/adeelone/myReadList/blob/main/SECURITY.md" target="_blank" rel="noopener noreferrer" referrerpolicy="no-referrer">Full reporting policy</a></div>
+  </main>
+  <footer class="site-footer compact-footer"><a href="./privacy.html">Privacy</a><a href="./terms.html">Terms</a><a href="./accessibility.html">Accessibility</a><a href="./security.html" aria-current="page">Security</a><small>&copy; 2026 Novel Phoenix. Not affiliated with NovelFire.</small></footer>
+</body>
+</html>

@@ -2,6 +2,8 @@ import { createPublicSnapshot, mergeSnapshot, normalizeState, parseCsv } from ".
 
 const STORAGE_KEY = "novel-phoenix-v1";
 const THEME_KEY = "novel-phoenix-theme-v1";
+const MAX_IMPORT_BYTES = 5_000_000;
+const MAX_PUBLIC_BYTES = 10_000_000;
 const isPreview = new URLSearchParams(location.search).has("preview");
 let state = isPreview ? previewState() : loadState();
 let dataSource = isPreview ? "preview" : state.library.length ? "local" : "loading";
@@ -124,7 +126,9 @@ async function loadPublishedState(force = false) {
   try {
     const response = await fetch("./data/library.json", { cache: "no-store", headers: { Accept: "application/json" } });
     if (!response.ok) throw new Error(`Public library returned ${response.status}.`);
-    state = normalizeState(await response.json());
+    const payload = await response.text();
+    if (payload.length > MAX_PUBLIC_BYTES) throw new Error("Public library exceeded the safety limit.");
+    state = normalizeState(JSON.parse(payload));
     dataSource = "public";
   } catch (error) {
     state = normalizeState({});
@@ -137,6 +141,8 @@ async function loadPublishedState(force = false) {
 async function importFile(file) {
   if (!file) return;
   try {
+    if (!/\.csv$/i.test(file.name)) throw new Error("Choose a CSV file exported by Novel Phoenix.");
+    if (file.size > MAX_IMPORT_BYTES) throw new Error("This CSV is larger than the 5 MB safety limit.");
     const rows = parseCsv(await file.text());
     if (!rows.length) throw new Error("No readable novels were found in this CSV.");
     const importedAt = new Date().toISOString();
@@ -214,7 +220,7 @@ function renderImports() {
 }
 
 function emptyMessage(title, body) { return `<div class="empty compact"><h2>${title}</h2><p>${body}</p></div>`; }
-function href(url) { return url ? `href="${escapeHtml(url)}" target="_blank" rel="noopener noreferrer"` : "aria-disabled=\"true\""; }
+function href(url) { return url ? `href="${escapeHtml(url)}" target="_blank" rel="noopener noreferrer" referrerpolicy="no-referrer"` : "aria-disabled=\"true\""; }
 function clamp(value) { return Math.max(0, Math.min(100, value)); }
 function escapeHtml(value) { return String(value || "").replace(/[&<>"']/g, (char) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[char]); }
 function formatDate(value) { if (!value) return "Not recorded"; return new Intl.DateTimeFormat(undefined, { dateStyle: "medium", timeStyle: "short" }).format(new Date(value)); }

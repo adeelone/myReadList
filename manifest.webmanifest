@@ -7,6 +7,12 @@
   "display": "standalone",
   "background_color": "#fdfdfc",
   "theme_color": "#c83b12",
+  "categories": ["books", "utilities"],
+  "shortcuts": [
+    { "name": "Library", "url": "./#library" },
+    { "name": "Reading history", "url": "./#history" },
+    { "name": "Import history", "url": "./#imports" }
+  ],
   "icons": [
     {
       "src": "./favicon.svg",

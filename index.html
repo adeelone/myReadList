@@ -2,11 +2,11 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; style-src-attr 'unsafe-inline'; connect-src 'self'; img-src 'self' data:; font-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'; frame-src 'none'; child-src 'none'; worker-src 'none'; media-src 'none'; manifest-src 'self'; upgrade-insecure-requests">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="Novel Phoenix - a public NovelFire reading library, progress tracker, and reading history.">
-  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <meta name="referrer" content="no-referrer">
   <meta name="color-scheme" content="light dark">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; connect-src 'self'; img-src 'self' data:; font-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; upgrade-insecure-requests">
   <meta property="og:title" content="Novel Phoenix">
   <meta property="og:description" content="A public reading library with current progress, last-read chapters, and reading history.">
   <meta property="og:type" content="website">
@@ -15,10 +15,11 @@
   <link rel="canonical" href="https://adeelone.github.io/myReadList/">
   <link rel="icon" href="./favicon.svg" type="image/svg+xml">
   <link rel="manifest" href="./manifest.webmanifest">
-  <script src="./theme-boot.js?v=2.0.0"></script>
-  <link rel="stylesheet" href="./styles.css?v=2.0.0">
+  <script src="./theme-boot.js?v=2.1.0"></script>
+  <link rel="stylesheet" href="./styles.css?v=2.1.0">
 </head>
 <body>
+  <a class="skip-link" href="#main-content">Skip to content</a>
   <header class="site-header">
     <a class="brand" href="#library" aria-label="Novel Phoenix home"><span class="brand-mark" aria-hidden="true">P</span><span>Novel Phoenix</span></a>
     <nav aria-label="Primary navigation">
@@ -54,7 +55,7 @@
     <input id="csvFile" type="file" accept=".csv,text/csv" hidden>
   </header>
 
-  <main class="page">
+  <main class="page" id="main-content">
     <div class="data-status" id="dataStatus" role="status">Loading public library...</div>
     <section id="libraryView" class="view">
       <div class="summary" aria-label="Library summary">
@@ -129,7 +130,19 @@
     </section>
   </main>
 
+  <footer class="site-footer">
+    <div><strong>Novel Phoenix</strong><span>A public, read-only snapshot of one NovelFire library.</span></div>
+    <nav aria-label="Legal and project links">
+      <a href="./privacy.html">Privacy</a>
+      <a href="./terms.html">Terms</a>
+      <a href="./accessibility.html">Accessibility</a>
+      <a href="./security.html">Security</a>
+      <a href="https://github.com/adeelone/myReadList" target="_blank" rel="noopener noreferrer" referrerpolicy="no-referrer">Source</a>
+    </nav>
+    <small>&copy; 2026 Novel Phoenix. Not affiliated with NovelFire.</small>
+  </footer>
+
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
-  <script type="module" src="./app.js?v=2.0.2"></script>
+  <script type="module" src="./app.js?v=2.1.0"></script>
 </body>
 </html>

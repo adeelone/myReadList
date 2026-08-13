@@ -12,6 +12,7 @@ Live site: <https://adeelone.github.io/myReadList/>
 - Import filenames are removed from published snapshots.
 - GitHub Actions runs tests, builds the static artifact, and deploys every push to `main`.
 - No database, server password, API key, analytics tracker, or browser-side admin token is required.
+- Privacy, terms, accessibility, security, and responsible-disclosure pages ship with the public artifact.
 
 This repository-backed approach is deliberate: it makes public reads reliable and owner writes secure without exposing credentials in frontend code.
 
@@ -85,10 +86,17 @@ The production build is written to `dist/`.
 - The public snapshot contains novel data, reading progress, links, and timestamps by design.
 - Local source filenames are removed before publication.
 - Only `http:` and `https:` links are accepted; unsafe URL schemes are discarded.
-- A restrictive Content Security Policy limits scripts, connections, images, and forms to the site itself.
+- A default-deny Content Security Policy limits scripts, connections, images, frames, workers, media, objects, and forms.
+- CSV imports are capped at 5 MB and 5,000 novels; rendered content is normalized and escaped.
+- Outbound links isolate the opener and suppress referrer information.
+- GitHub Actions uses pinned commits, scoped job permissions, CodeQL scanning, Dependabot, and immutable build artifacts.
 - Appearance preferences and local drafts remain in browser storage until cleared.
 
-See `SECURITY.md` for vulnerability reporting.
+The live site includes [Privacy](https://adeelone.github.io/myReadList/privacy.html), [Terms](https://adeelone.github.io/myReadList/terms.html), [Accessibility](https://adeelone.github.io/myReadList/accessibility.html), and [Security](https://adeelone.github.io/myReadList/security.html) pages. See `SECURITY.md` for private vulnerability reporting and `docs/SECURITY-OPERATIONS.md` for the threat model and release checklist.
+
+### Firewall boundary
+
+GitHub Pages provides HTTPS and operates the hosting perimeter. Novel Phoenix has no origin server or public write API. GitHub Pages does not expose custom WAF rules or arbitrary HTTP response headers for a project site, so the repository does not claim that a custom firewall is active. If a verified custom domain is added later, a managed proxy/WAF such as Cloudflare can provide rate limiting and managed rules in front of Pages.
 
 ## Project files
 

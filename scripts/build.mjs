@@ -7,6 +7,11 @@ const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const output = path.join(root, "dist");
 const files = [
   "index.html",
+  "404.html",
+  "privacy.html",
+  "terms.html",
+  "accessibility.html",
+  "security.html",
   "styles.css",
   "app.js",
   "theme-boot.js",
@@ -14,6 +19,7 @@ const files = [
   "manifest.webmanifest",
   "robots.txt",
   "sitemap.xml",
+  ".well-known/security.txt",
   ".nojekyll",
   "novelfire-readlist.user.js",
   "novelfire-readlist.bookmarklet.txt"
@@ -22,6 +28,7 @@ const files = [
 await rm(output, { recursive: true, force: true });
 await mkdir(path.join(output, "lib"), { recursive: true });
 await mkdir(path.join(output, "data"), { recursive: true });
+await mkdir(path.join(output, ".well-known"), { recursive: true });
 
 for (const file of files) await cp(path.join(root, file), path.join(output, file));
 await cp(path.join(root, "lib", "core.js"), path.join(output, "lib", "core.js"));

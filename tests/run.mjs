@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
-import { createPublicSnapshot, mergeSnapshot, normalizeState, parseCsv, safeUrl } from "../lib/core.js";
+import { createPublicSnapshot, MAX_CSV_CHARACTERS, MAX_LIBRARY, mergeSnapshot, normalizeState, parseCsv, safeUrl } from "../lib/core.js";
 
 const tests = [];
 const test = (name, fn) => tests.push({ name, fn });
@@ -27,6 +27,11 @@ test("unsafe URL protocols are discarded", () => {
   assert.equal(safeUrl("javascript:alert(1)"), "");
   assert.equal(safeUrl("data:text/html,test"), "");
   assert.equal(safeUrl("https://novelfire.net/book/safe"), "https://novelfire.net/book/safe");
+});
+
+test("oversized snapshots are rejected before publication", () => {
+  assert.throws(() => parseCsv("x".repeat(MAX_CSV_CHARACTERS + 1)), /5 MB safety limit/);
+  assert.throws(() => mergeSnapshot({}, Array.from({ length: MAX_LIBRARY + 1 }, () => ({ title: "Too many" }))), /5,000 novel safety limit/);
 });
 
 test("mergeSnapshot records only forward reading progress", () => {
@@ -56,18 +61,46 @@ test("normalizeState clamps corrupt progress values", () => {
 
 const index = await readFile(new URL("../index.html", import.meta.url), "utf8");
 const app = await readFile(new URL("../app.js", import.meta.url), "utf8");
+const legalFiles = await Promise.all(["privacy", "terms", "accessibility", "security"].map((name) => readFile(new URL(`../${name}.html`, import.meta.url), "utf8")));
+const pagesWorkflow = await readFile(new URL("../.github/workflows/pages.yml", import.meta.url), "utf8");
+const codeqlWorkflow = await readFile(new URL("../.github/workflows/codeql.yml", import.meta.url), "utf8");
+const securityText = await readFile(new URL("../.well-known/security.txt", import.meta.url), "utf8");
 
 test("site has production metadata and a restrictive CSP", () => {
   assert.match(index, /Content-Security-Policy/);
   assert.match(index, /object-src 'none'/);
+  assert.match(index, /worker-src 'none'/);
+  assert.match(index, /form-action 'none'/);
+  assert.ok(index.indexOf("Content-Security-Policy") < index.indexOf('name="viewport"'));
   assert.match(index, /rel="canonical"/);
   assert.match(index, /manifest\.webmanifest/);
+});
+
+test("legal, accessibility, and security disclosures are published", () => {
+  for (const html of legalFiles) {
+    assert.match(html, /Content-Security-Policy/);
+    assert.match(html, /Novel Phoenix/);
+    assert.doesNotMatch(html, /<script[^>]+https?:\/\//i);
+  }
+  assert.match(index, /privacy\.html/);
+  assert.match(index, /security\.html/);
+  assert.match(securityText, /security\/advisories\/new/);
+});
+
+test("deployment and security actions are immutable and least privilege", () => {
+  assert.doesNotMatch(`${pagesWorkflow}\n${codeqlWorkflow}`, /uses:\s+[^\s]+@v\d/);
+  assert.match(pagesWorkflow, /persist-credentials: false/);
+  assert.match(pagesWorkflow, /permissions:\n\s+contents: read/);
+  assert.match(codeqlWorkflow, /security-events: write/);
+  assert.match(codeqlWorkflow, /github\/codeql-action\/analyze@[0-9a-f]{40}/);
 });
 
 test("application loads published data and labels local drafts", () => {
   assert.match(app, /\.\/data\/library\.json/);
   assert.match(app, /Local draft - not published/);
   assert.match(app, /createPublicSnapshot/);
+  assert.match(app, /MAX_IMPORT_BYTES/);
+  assert.match(app, /noopener noreferrer/);
 });
 
 test("all production scripts are local modules", () => {
