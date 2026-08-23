@@ -11,7 +11,8 @@
     "dev": "node scripts/serve.mjs",
     "test": "node tests/run.mjs",
     "build": "node scripts/build.mjs",
-    "check": "npm test && npm run build && node --check novelfire-readlist.js && node --check novelfire-readlist.user.js",
+    "check": "npm test && npm run build && node --check novelfire-readlist.js && node --check novelfire-readlist.user.js && node scripts/generate-readlist.mjs --check && node scripts/bookmarklet.mjs --check",
+    "generate": "node scripts/generate-readlist.mjs && node scripts/bookmarklet.mjs",
     "bookmarklet": "node scripts/bookmarklet.mjs",
     "ingest": "node scripts/ingest.mjs",
     "publish:snapshot": "node scripts/publish-snapshot.mjs"

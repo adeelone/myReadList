@@ -26,6 +26,14 @@ This repository-backed approach is deliberate: it makes public reads reliable an
 
 The exporter scans every library page, fetches author names, preserves NovelFire library order, records the export time, and includes direct novel and last-read chapter URLs. Legacy exports remain supported.
 
+`novelfire-readlist.user.js` and `novelfire-readlist.bookmarklet.txt` are generated from `novelfire-readlist.js`, the single source of truth for the extraction logic. After editing `novelfire-readlist.js`, run:
+
+```powershell
+npm run generate
+```
+
+`npm run check` fails if either generated file is out of date.
+
 ## Publish a new snapshot
 
 ### Recommended: one command
@@ -105,6 +113,7 @@ GitHub Pages provides HTTPS and operates the hosting perimeter. Novel Phoenix ha
 - `data/library.json`: public reading data consumed by visitors.
 - `scripts/ingest.mjs`: convert a CSV into public data without committing.
 - `scripts/publish-snapshot.mjs`: validate, commit, and push one snapshot.
-- `novelfire-readlist.user.js`: recommended Tampermonkey exporter.
-- `novelfire-readlist.js`: developer-console fallback.
+- `scripts/generate-readlist.mjs`, `scripts/bookmarklet.mjs`: regenerate the userscript and bookmarklet from `novelfire-readlist.js`.
+- `novelfire-readlist.user.js`: recommended Tampermonkey exporter (generated).
+- `novelfire-readlist.js`: developer-console bookmarklet source (single source of truth).
 - `.github/workflows/pages.yml`: CI and GitHub Pages deployment.

@@ -36,11 +36,7 @@
   };
 
   const extractAuthorFromBookPage = (doc) => {
-    const authorCandidates = [
-      ...doc.querySelectorAll('a[href*="/author/"]'),
-      ...doc.querySelectorAll('[class*="author"]'),
-      ...doc.querySelectorAll('[id*="author"]'),
-    ];
+    const authorCandidates = [...doc.querySelectorAll('a[href*="/author/"]'), ...doc.querySelectorAll('[class*="author"]'), ...doc.querySelectorAll('[id*="author"]')];
     for (const node of authorCandidates) {
       const text = clean(node.textContent).replace(/^author\s*:?\s*/i, "");
       if (text) return text;
