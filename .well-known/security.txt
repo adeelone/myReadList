@@ -1,5 +1,5 @@
 Contact: https://github.com/adeelone/myReadList/security/advisories/new
 Expires: 2027-08-12T23:59:59Z
 Preferred-Languages: en
-Canonical: https://adeelone.github.io/myReadList/security.txt
-Policy: https://adeelone.github.io/myReadList/security.html
+Canonical: https://novel-phoenix-readlist.vercel.app/.well-known/security.txt
+Policy: https://novel-phoenix-readlist.vercel.app/security

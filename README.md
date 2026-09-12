@@ -1,30 +1,32 @@
 # Novel Phoenix
 
-Novel Phoenix is a public NovelFire reading library. Visitors can see the current library, last-read chapter, reading progress, direct novel/chapter links, reading history, and import history. The owner can preview a CSV snapshot locally before publishing a sanitized public data file.
+Novel Phoenix is a public reading library for exports from NovelFire and NovelPhoenix.com. Visitors can see the current library, last-read chapter, reading progress, source novel/chapter links, reading history, and import history. The owner can preview a CSV snapshot locally before publishing a sanitized public data file.
 
-Live site: <https://adeelone.github.io/myReadList/>
+Live site: <https://novel-phoenix-readlist.vercel.app/>
+
+Fallback: <https://adeelone.github.io/myReadList/>
 
 ## Architecture
 
-- The public site is a static GitHub Pages deployment.
+- The production site is a static Vercel deployment, with GitHub Pages retained as a fallback.
 - Public reading data lives in `data/library.json` and is safe to cache, review, and version in Git.
 - Browser imports are local drafts stored under `novel-phoenix-v1`; they never overwrite the public site by themselves.
 - Import filenames are removed from published snapshots.
-- GitHub Actions runs tests, builds the static artifact, and deploys every push to `main`.
+- GitHub Actions runs tests and deploys the fallback Pages artifact on every push to `main`; Vercel serves the same `dist/` build in production.
 - No database, server password, API key, analytics tracker, or browser-side admin token is required.
 - Privacy, terms, accessibility, security, and responsible-disclosure pages ship with the public artifact.
 
 This repository-backed approach is deliberate: it makes public reads reliable and owner writes secure without exposing credentials in frontend code.
 
-## Export from NovelFire
+## Export from NovelFire or NovelPhoenix.com
 
 1. Install Tampermonkey.
 2. Create a userscript using `novelfire-readlist.user.js`.
-3. Open `https://novelfire.net/account/library` while signed in.
-4. Select **Export to Novel Phoenix**.
+3. While signed in, open `https://novelfire.net/account/library` or your personal library/bookshelf page on `https://novelphoenix.com/`.
+4. Select **Export reading list**.
 5. Download the generated CSV.
 
-The exporter scans every library page, fetches author names, preserves NovelFire library order, records the export time, and includes direct novel and last-read chapter URLs. Legacy exports remain supported.
+The exporter detects the active source, scans paginated library pages, fetches author and chapter-count metadata, preserves library order, records the export time, and includes direct novel and last-read chapter URLs. Legacy NovelFire exports remain supported. Because NovelPhoenix.com library pages require an authenticated account, run the exporter only on your own signed-in library page.
 
 `novelfire-readlist.user.js` and `novelfire-readlist.bookmarklet.txt` are generated from `novelfire-readlist.js`, the single source of truth for the extraction logic. After editing `novelfire-readlist.js`, run:
 
@@ -51,7 +53,7 @@ The command:
 3. compares it with the current public snapshot and records forward progress;
 4. runs the automated tests and production build;
 5. commits only `data/library.json`;
-6. pushes `main`, which triggers the Pages deployment.
+6. pushes `main`, which triggers connected Vercel and fallback Pages deployments.
 
 ### Browser-assisted alternative
 
@@ -100,20 +102,23 @@ The production build is written to `dist/`.
 - GitHub Actions uses pinned commits, scoped job permissions, CodeQL scanning, Dependabot, and immutable build artifacts.
 - Appearance preferences and local drafts remain in browser storage until cleared.
 
-The live site includes [Privacy](https://adeelone.github.io/myReadList/privacy.html), [Terms](https://adeelone.github.io/myReadList/terms.html), [Accessibility](https://adeelone.github.io/myReadList/accessibility.html), and [Security](https://adeelone.github.io/myReadList/security.html) pages. See `SECURITY.md` for private vulnerability reporting and `docs/SECURITY-OPERATIONS.md` for the threat model and release checklist.
+The live site includes [Privacy](https://novel-phoenix-readlist.vercel.app/privacy), [Terms](https://novel-phoenix-readlist.vercel.app/terms), [Accessibility](https://novel-phoenix-readlist.vercel.app/accessibility), and [Security](https://novel-phoenix-readlist.vercel.app/security) pages. See `SECURITY.md` for private vulnerability reporting and `docs/SECURITY-OPERATIONS.md` for the threat model and release checklist.
 
 ### Firewall boundary
 
-GitHub Pages provides HTTPS and operates the hosting perimeter. Novel Phoenix has no origin server or public write API. GitHub Pages does not expose custom WAF rules or arbitrary HTTP response headers for a project site, so the repository does not claim that a custom firewall is active. If a verified custom domain is added later, a managed proxy/WAF such as Cloudflare can provide rate limiting and managed rules in front of Pages.
+Vercel provides HTTPS, CDN delivery, platform-level DDoS mitigation, and the response headers configured in `vercel.json`. Novel Phoenix has no application server or public write API. The project does not claim custom paid WAF rules or rate limits that have not been enabled in the Vercel account. GitHub Pages remains a fallback host with a more limited response-header surface.
 
 ## Project files
 
 - `index.html`, `styles.css`, `app.js`: production site.
 - `lib/core.js`: CSV parsing, validation, snapshot merging, and sanitization.
+- `lib/render.js`: shared HTML-rendering helpers (escaping, links, the novel-row template) used by both `app.js` and the build-time pre-renderer, so the live table and the pre-rendered `view-source:` HTML can never drift apart.
 - `data/library.json`: public reading data consumed by visitors.
+- `feed.xml` (generated): Atom feed of forward reading-progress events, built from `data/library.json` at build time — see `scripts/build.mjs`.
 - `scripts/ingest.mjs`: convert a CSV into public data without committing.
 - `scripts/publish-snapshot.mjs`: validate, commit, and push one snapshot.
 - `scripts/generate-readlist.mjs`, `scripts/bookmarklet.mjs`: regenerate the userscript and bookmarklet from `novelfire-readlist.js`.
 - `novelfire-readlist.user.js`: recommended Tampermonkey exporter (generated).
 - `novelfire-readlist.js`: developer-console bookmarklet source (single source of truth).
-- `.github/workflows/pages.yml`: CI and GitHub Pages deployment.
+- `vercel.json`: production build, clean URLs, and hardened response headers.
+- `.github/workflows/pages.yml`: CI and fallback GitHub Pages deployment.

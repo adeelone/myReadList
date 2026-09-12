@@ -35,7 +35,7 @@ if (!changed) {
 const date = new Date().toISOString().slice(0, 10);
 run("git", ["commit", "-m", `update reading snapshot ${date}`]);
 run("git", ["push", "origin", "main"]);
-console.log("Snapshot pushed. GitHub Pages will deploy it automatically.");
+console.log("Snapshot pushed. Connected Vercel and GitHub Pages deployments will update automatically.");
 
 function run(command, args, capture = false) {
   const result = spawnSync(command, args, { cwd: root, encoding: "utf8", stdio: capture ? "pipe" : "inherit", shell: false });

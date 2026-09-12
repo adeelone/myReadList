@@ -1,4 +1,5 @@
 import { createPublicSnapshot, mergeSnapshot, normalizeState, parseCsv } from "./lib/core.js";
+import { bookRow as renderBookRow, escapeHtml, href } from "./lib/render.js";
 
 const STORAGE_KEY = "novel-phoenix-v1";
 const THEME_KEY = "novel-phoenix-theme-v1";
@@ -20,6 +21,7 @@ const els = {
   clearDraft: $("clearDraftButton"), publishedNotice: $("publishedNotice")
 };
 Object.assign(els, {
+  pageHeading: $("pageHeading"), pageSummary: $("pageSummary"),
   themeButton: $("themeButton"), themePanel: $("themePanel"), closeTheme: $("closeTheme"),
   backgroundSwatches: $("backgroundSwatches"), accentSwatches: $("accentSwatches"),
   backgroundColor: $("backgroundColor"), accentColor: $("accentColor"), resetTheme: $("resetTheme")
@@ -107,7 +109,7 @@ function loadState() {
 function previewState() {
   const now = new Date();
   const earlier = new Date(now.getTime() - 4 * 86400000);
-  const book = (id, title, author, read, total, chapter, days, order) => ({ id, title, author, chaptersRead: read, totalChapters: total, progress: read / total * 100, libraryOrder: order, bookUrl: `https://novelfire.net/book/${id}`, chapterUrl: `https://novelfire.net/book/${id}/chapter-${read}`, chapterTitle: chapter, firstSeenAt: earlier.toISOString(), updatedAt: new Date(now.getTime() - days * 86400000).toISOString() });
+  const book = (id, title, author, read, total, chapter, days, order) => ({ id, title, author, source: "NovelFire", chaptersRead: read, totalChapters: total, progress: read / total * 100, libraryOrder: order, bookUrl: `https://novelfire.net/book/${id}`, chapterUrl: `https://novelfire.net/book/${id}/chapter-${read}`, chapterTitle: chapter, firstSeenAt: earlier.toISOString(), updatedAt: new Date(now.getTime() - days * 86400000).toISOString() });
   const library = [
     book("reverend-insanity", "Reverend Insanity", "Gu Zhen Ren", 108, 200, "Chapter 108: Phoenix", 0, 1),
     book("lord-of-mysteries", "Lord of the Mysteries", "Cuttlefish That Loves Diving", 89, 100, "Chapter 89: The Door", 1, 2),
@@ -173,7 +175,7 @@ function render() {
   els.average.textContent = `${(books.length ? books.reduce((sum, book) => sum + book.progress, 0) / books.length : 0).toFixed(1)}%`;
   els.resultsCount.textContent = `${visible.length} ${visible.length === 1 ? "novel" : "novels"}`;
   els.empty.classList.toggle("hidden", books.length > 0);
-  els.body.innerHTML = visible.map(bookRow).join("");
+  els.body.innerHTML = visible.map((book) => renderBookRow(book, { formatDate })).join("");
   renderDataStatus(); renderLastRead(); renderHistory(); renderImports();
 }
 
@@ -191,10 +193,6 @@ function renderDataStatus() {
   els.publishedNotice.classList.toggle("hidden", dataSource === "local");
 }
 
-function bookRow(book) {
-  return `<tr><td><a class="title-link" ${href(book.bookUrl)}>${escapeHtml(book.title)}</a></td><td>${escapeHtml(book.author || "Unknown")}</td><td><div class="progress-cell"><span>${book.progress.toFixed(1)}%</span><i><b style="width:${clamp(book.progress)}%"></b></i><small>${book.chaptersRead.toLocaleString()} / ${book.totalChapters.toLocaleString()}</small></div></td><td><a class="chapter-link" ${href(book.chapterUrl)}>${escapeHtml(book.chapterTitle || "Not recorded")}</a><small class="date">${formatDate(book.updatedAt)}</small></td><td><div class="row-links">${book.chapterUrl ? `<a ${href(book.chapterUrl)}>Continue</a>` : ""}${book.bookUrl ? `<a ${href(book.bookUrl)}>Novel page</a>` : ""}</div></td></tr>`;
-}
-
 function renderLastRead() {
   const event = state.history[0];
   const orderedBook = [...state.library].sort((a, b) => a.libraryOrder - b.libraryOrder)[0];
@@ -204,25 +202,22 @@ function renderLastRead() {
   if (!book) {
     const hasLibrary = state.library.length > 0;
     els.lastTime.textContent = hasLibrary ? "Not available in the legacy export" : "No reading activity yet";
-    els.lastCard.innerHTML = `<div class="book-glyph" aria-hidden="true">P</div><div class="last-title"><h2>${hasLibrary ? "Activity order unavailable" : "No published novels yet"}</h2><p>${hasLibrary ? "The first new-format snapshot will establish the latest read." : "Import a NovelFire snapshot to create a local draft."}</p></div><div class="last-detail"><span>Last chapter</span><strong>-</strong><small>-</small></div><div class="last-detail"><span>Progress</span><strong>-</strong><small>-</small></div><div class="last-actions"></div>`;
+    els.lastCard.innerHTML = `<div class="book-glyph" aria-hidden="true">P</div><div class="last-title"><h2>${hasLibrary ? "Activity order unavailable" : "No published novels yet"}</h2><p>${hasLibrary ? "The first new-format snapshot will establish the latest read." : "Import a supported reading-list snapshot to create a local draft."}</p></div><div class="last-detail"><span>Last chapter</span><strong>-</strong><small>-</small></div><div class="last-detail"><span>Progress</span><strong>-</strong><small>-</small></div><div class="last-actions"></div>`;
     return;
   }
   els.lastTime.textContent = `Updated ${formatDate(book.updatedAt)}`;
-  els.lastCard.innerHTML = `<div class="book-glyph" aria-hidden="true">P</div><div class="last-title"><h2>${escapeHtml(book.title)}</h2><p>${escapeHtml(book.author || "Unknown author")}</p></div><div class="last-detail"><span>Last chapter</span><strong>${escapeHtml(book.chapterTitle || `Chapter ${book.chaptersRead}`)}</strong><small>${book.chaptersRead.toLocaleString()} chapters read</small></div><div class="last-detail"><span>Progress</span><strong class="accent">${book.progress.toFixed(1)}%</strong><small>${book.chaptersRead.toLocaleString()} / ${book.totalChapters.toLocaleString()} chapters</small></div><div class="last-actions">${book.chapterUrl ? `<a ${href(book.chapterUrl)}>Continue reading &rarr;</a>` : ""}${book.bookUrl ? `<a ${href(book.bookUrl)}>Novel page &nearr;</a>` : ""}</div>`;
+  els.lastCard.innerHTML = `<div class="book-glyph" aria-hidden="true">P</div><div class="last-title"><h2>${escapeHtml(book.title)}</h2><p>${escapeHtml(book.author || "Unknown author")} · ${escapeHtml(book.source || "Reading source")}</p></div><div class="last-detail"><span>Last chapter</span><strong>${escapeHtml(book.chapterTitle || `Chapter ${book.chaptersRead}`)}</strong><small>${book.chaptersRead.toLocaleString()} chapters read</small></div><div class="last-detail"><span>Progress</span><strong class="accent">${book.progress.toFixed(1)}%</strong><small>${book.chaptersRead.toLocaleString()} / ${book.totalChapters.toLocaleString()} chapters</small></div><div class="last-actions">${book.chapterUrl ? `<a ${href(book.chapterUrl)}>Continue reading &rarr;</a>` : ""}${book.bookUrl ? `<a ${href(book.bookUrl)}>Novel page &nearr;</a>` : ""}</div>`;
 }
 
 function renderHistory() {
-  els.history.innerHTML = state.history.length ? state.history.map((event) => `<article class="timeline-item"><time>${formatDate(event.importedAt)}</time><div><h2>${escapeHtml(event.title)}</h2><p>Advanced from chapter ${event.fromChapter.toLocaleString()} to ${event.toChapter.toLocaleString()}.</p><div class="inline-links">${event.chapterUrl ? `<a ${href(event.chapterUrl)}>${escapeHtml(event.chapterTitle || "Open last read chapter")}</a>` : ""}${event.bookUrl ? `<a ${href(event.bookUrl)}>Novel page &nearr;</a>` : ""}</div></div></article>`).join("") : emptyMessage("No reading changes yet", "Import a newer snapshot after you have read more chapters.");
+  els.history.innerHTML = state.history.length ? state.history.map((event) => `<article class="timeline-item"><time>${formatDate(event.importedAt)}</time><div><h2>${escapeHtml(event.title)}</h2><p>Advanced from chapter ${event.fromChapter.toLocaleString()} to ${event.toChapter.toLocaleString()} on ${escapeHtml(event.source || "the reading source")}.</p><div class="inline-links">${event.chapterUrl ? `<a ${href(event.chapterUrl)}>${escapeHtml(event.chapterTitle || "Open last read chapter")}</a>` : ""}${event.bookUrl ? `<a ${href(event.bookUrl)}>Novel page &nearr;</a>` : ""}</div></div></article>`).join("") : emptyMessage("No reading changes yet", "Import a newer snapshot after you have read more chapters.");
 }
 
 function renderImports() {
-  els.imports.innerHTML = state.imports.length ? state.imports.map((item, index) => `<article class="timeline-item ${index === 0 ? "current" : ""}"><time>${formatDate(item.importedAt)}</time><div><h2>${item.novelCount.toLocaleString()} novels imported</h2><p>${item.changes} progress ${item.changes === 1 ? "change" : "changes"} - ${escapeHtml(item.fileName || item.label || "NovelFire snapshot")}</p></div></article>`).join("") : emptyMessage("No imports yet", "Your snapshot history will appear here.");
+  els.imports.innerHTML = state.imports.length ? state.imports.map((item, index) => `<article class="timeline-item ${index === 0 ? "current" : ""}"><time>${formatDate(item.importedAt)}</time><div><h2>${item.novelCount.toLocaleString()} novels imported</h2><p>${item.changes} progress ${item.changes === 1 ? "change" : "changes"} - ${escapeHtml(item.fileName || item.label || "Reading snapshot")}</p></div></article>`).join("") : emptyMessage("No imports yet", "Your snapshot history will appear here.");
 }
 
 function emptyMessage(title, body) { return `<div class="empty compact"><h2>${title}</h2><p>${body}</p></div>`; }
-function href(url) { return url ? `href="${escapeHtml(url)}" target="_blank" rel="noopener noreferrer" referrerpolicy="no-referrer"` : "aria-disabled=\"true\""; }
-function clamp(value) { return Math.max(0, Math.min(100, value)); }
-function escapeHtml(value) { return String(value || "").replace(/[&<>"']/g, (char) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[char]); }
 function formatDate(value) { if (!value) return "Not recorded"; return new Intl.DateTimeFormat(undefined, { dateStyle: "medium", timeStyle: "short" }).format(new Date(value)); }
 function showToast(message, error = false) { els.toast.textContent = message; els.toast.classList.toggle("error", error); els.toast.classList.add("show"); clearTimeout(showToast.timer); showToast.timer = setTimeout(() => els.toast.classList.remove("show"), 3600); }
 
@@ -270,18 +265,34 @@ els.accentColor.addEventListener("input", (event) => setThemeColor("accent", eve
 els.resetTheme.addEventListener("click", () => { theme[theme.mode] = theme.mode === "light" ? { background: "#fdfdfc", accent: "#c83b12" } : { background: "#111210", accent: "#ed6a3d" }; saveTheme(); applyTheme(); });
 document.addEventListener("click", (event) => { if (!els.themePanel.classList.contains("hidden") && !event.target.closest(".header-actions")) toggleThemePanel(false); });
 document.addEventListener("keydown", (event) => { if (event.key === "Escape") toggleThemePanel(false); });
-document.querySelectorAll(".nav-link").forEach((button) => button.addEventListener("click", () => {
-  document.querySelectorAll(".nav-link").forEach((item) => item.classList.toggle("active", item === button));
+const viewMeta = {
+  library: { title: "Novel Phoenix — Public Reading Tracker", heading: "Novel Phoenix reading library", summary: "A public shelf from NovelFire and NovelPhoenix.com, with chapter progress and direct reading links.", description: "Browse a public reading library with 110 novels, chapter progress, last-read links, and transparent snapshot history." },
+  history: { title: "Reading History | Novel Phoenix", heading: "Novel Phoenix reading history", summary: "See chapter progress recorded as newer snapshots move novels forward.", description: "Review Novel Phoenix reading history and chapter progress recorded from published reading-list snapshots." },
+  imports: { title: "Snapshot History | Novel Phoenix", heading: "Novel Phoenix snapshot history", summary: "Review published and locally previewed library imports.", description: "Review Novel Phoenix snapshot imports and learn how the public reading list is updated." }
+};
+
+function activateView(requestedView) {
+  const viewName = viewMeta[requestedView] ? requestedView : "library";
+  document.querySelectorAll(".nav-link").forEach((item) => item.classList.toggle("active", item.dataset.view === viewName));
   document.querySelectorAll(".view").forEach((view) => view.classList.add("hidden"));
-  $(`${button.dataset.view}View`).classList.remove("hidden");
-  location.hash = button.dataset.view;
+  $(`${viewName}View`).classList.remove("hidden");
+  els.pageHeading.textContent = viewMeta[viewName].heading;
+  els.pageSummary.textContent = viewMeta[viewName].summary;
+  document.title = viewMeta[viewName].title;
+  document.querySelector('meta[name="description"]').content = viewMeta[viewName].description;
+}
+
+document.querySelectorAll(".nav-link").forEach((link) => link.addEventListener("click", (event) => {
+  event.preventDefault();
+  if (location.hash === `#${link.dataset.view}`) activateView(link.dataset.view);
+  else location.hash = link.dataset.view;
 }));
+window.addEventListener("hashchange", () => activateView(location.hash.slice(1)));
 ["dragenter", "dragover"].forEach((type) => els.drop.addEventListener(type, (event) => { event.preventDefault(); els.drop.classList.add("dragover"); }));
 ["dragleave", "drop"].forEach((type) => els.drop.addEventListener(type, (event) => { event.preventDefault(); els.drop.classList.remove("dragover"); }));
 els.drop.addEventListener("drop", (event) => importFile(event.dataTransfer.files?.[0]));
 
-const initialView = location.hash.slice(1);
-if (["history", "imports"].includes(initialView)) document.querySelector(`[data-view="${initialView}"]`).click();
+activateView(location.hash.slice(1));
 applyTheme();
 render();
 loadPublishedState();

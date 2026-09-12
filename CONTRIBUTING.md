@@ -2,7 +2,7 @@
 
 Small, focused pull requests are welcome.
 
-1. Do not commit private NovelFire exports, credentials, local filenames, or unrelated reading data.
+1. Do not commit private NovelFire or NovelPhoenix.com exports, credentials, local filenames, or unrelated reading data.
 2. Create a branch from `main` and explain the user-visible impact.
 3. Run `npm ci --ignore-scripts` and `npm run check`.
 4. For interface changes, verify the library, history, imports, appearance panel, keyboard flow, and a mobile viewport.

@@ -4,28 +4,43 @@
   <meta charset="UTF-8">
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; style-src-attr 'unsafe-inline'; connect-src 'self'; img-src 'self' data:; font-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'; frame-src 'none'; child-src 'none'; worker-src 'none'; media-src 'none'; manifest-src 'self'; upgrade-insecure-requests">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="Novel Phoenix - a public NovelFire reading library, progress tracker, and reading history.">
+  <meta name="description" content="Browse a public reading library with 110 novels from NovelFire and NovelPhoenix.com, chapter progress, direct links, and snapshot history.">
   <meta name="referrer" content="no-referrer">
   <meta name="color-scheme" content="light dark">
-  <meta property="og:title" content="Novel Phoenix">
-  <meta property="og:description" content="A public reading library with current progress, last-read chapters, and reading history.">
+  <meta name="theme-color" content="#fdfdfc" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#111210" media="(prefers-color-scheme: dark)">
+  <meta property="og:site_name" content="Novel Phoenix">
+  <meta property="og:title" content="Novel Phoenix — Public Reading Tracker">
+  <meta property="og:description" content="Browse 110 novels, chapter progress, last-read links, and transparent snapshot history.">
   <meta property="og:type" content="website">
-  <meta property="og:url" content="https://adeelone.github.io/myReadList/">
-  <title>Novel Phoenix</title>
-  <link rel="canonical" href="https://adeelone.github.io/myReadList/">
+  <meta property="og:url" content="https://novel-phoenix-readlist.vercel.app/">
+  <meta property="og:image" content="https://novel-phoenix-readlist.vercel.app/social-card.png">
+  <meta property="og:image:type" content="image/png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="Novel Phoenix public reading library">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Novel Phoenix — Public Reading Tracker">
+  <meta name="twitter:description" content="Browse 110 novels, chapter progress, last-read links, and transparent snapshot history.">
+  <meta name="twitter:image" content="https://novel-phoenix-readlist.vercel.app/social-card.png">
+  <title>Novel Phoenix — Public Reading Tracker</title>
+  <link rel="canonical" href="https://novel-phoenix-readlist.vercel.app/">
   <link rel="icon" href="./favicon.svg" type="image/svg+xml">
+  <link rel="alternate" type="text/plain" href="./llms.txt" title="LLM information">
+  <link rel="alternate" type="application/atom+xml" href="./feed.xml" title="Novel Phoenix reading history">
   <link rel="manifest" href="./manifest.webmanifest">
-  <script src="./theme-boot.js?v=2.1.0"></script>
-  <link rel="stylesheet" href="./styles.css?v=2.1.0">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebSite","name":"Novel Phoenix","url":"https://novel-phoenix-readlist.vercel.app/","description":"A public reading library sourced from NovelFire and NovelPhoenix.com, with chapter progress, direct links, and snapshot history.","inLanguage":"en","isAccessibleForFree":true,"publisher":{"@type":"Person","name":"Aden Ramirez"},"sameAs":["https://github.com/adeelone/myReadList"]}</script>
+  <script src="./theme-boot.js?v=2.2.0"></script>
+  <link rel="stylesheet" href="./styles.css?v=2.2.0">
 </head>
 <body>
   <a class="skip-link" href="#main-content">Skip to content</a>
   <header class="site-header">
     <a class="brand" href="#library" aria-label="Novel Phoenix home"><span class="brand-mark" aria-hidden="true">P</span><span>Novel Phoenix</span></a>
     <nav aria-label="Primary navigation">
-      <button class="nav-link active" data-view="library">Library</button>
-      <button class="nav-link" data-view="history">History</button>
-      <button class="nav-link" data-view="imports">Imports</button>
+      <a class="nav-link active" href="#library" data-view="library">Library</a>
+      <a class="nav-link" href="#history" data-view="history">History</a>
+      <a class="nav-link" href="#imports" data-view="imports">Imports</a>
     </nav>
     <div class="header-actions">
       <button class="theme-trigger" id="themeButton" type="button" aria-label="Appearance" aria-expanded="false" aria-controls="themePanel">
@@ -56,6 +71,10 @@
   </header>
 
   <main class="page" id="main-content">
+    <section class="page-intro" aria-labelledby="pageHeading">
+      <h1 id="pageHeading">Novel Phoenix reading library</h1>
+      <p id="pageSummary">A public shelf from NovelFire and NovelPhoenix.com, with chapter progress and direct reading links.</p>
+    </section>
     <div class="data-status" id="dataStatus" role="status">Loading public library...</div>
     <section id="libraryView" class="view">
       <div class="summary" aria-label="Library summary">
@@ -65,10 +84,10 @@
       </div>
 
       <section class="last-read-section">
-        <div class="section-heading"><h1>Last read</h1><p id="lastReadTime">No reading activity yet</p></div>
+        <div class="section-heading"><h2>Last read</h2><p id="lastReadTime">No reading activity yet</p></div>
         <article class="last-read" id="lastReadCard">
           <div class="book-glyph" aria-hidden="true">P</div>
-          <div class="last-title"><h2>Import your NovelFire library</h2><p>Your most recently advanced novel will appear here.</p></div>
+          <div class="last-title"><h2>Import your reading library</h2><p>Your most recently advanced novel will appear here.</p></div>
           <div class="last-detail"><span>Last chapter</span><strong>—</strong><small>—</small></div>
           <div class="last-detail"><span>Progress</span><strong>—</strong><small>—</small></div>
           <div class="last-actions"></div>
@@ -76,7 +95,7 @@
       </section>
 
       <section class="library-section">
-        <div class="section-heading"><h1>Library</h1><p id="resultsCount">0 novels</p></div>
+        <div class="section-heading"><h2>Library</h2><p id="resultsCount">0 novels</p></div>
         <div class="controls">
           <label class="search"><span aria-hidden="true">⌕</span><input id="searchInput" type="search" placeholder="Search your library" aria-label="Search your library"></label>
           <select id="sortSelect" aria-label="Sort library">
@@ -101,17 +120,17 @@
     </section>
 
     <section id="historyView" class="view hidden">
-      <div class="page-title"><h1>Reading history</h1><p>Progress recorded when a newer snapshot moves a novel forward.</p></div>
+      <div class="page-title"><h2>Reading history</h2><p>Progress recorded when a newer snapshot moves a novel forward.</p></div>
       <div class="timeline" id="readingHistory"></div>
     </section>
 
     <section id="importsView" class="view hidden">
-      <div class="page-title"><h1>Import history</h1><p>Every published or locally imported library snapshot, newest first.</p></div>
+      <div class="page-title"><h2>Import history</h2><p>Every published or locally imported library snapshot, newest first.</p></div>
       <div class="import-layout">
         <div class="timeline" id="importHistory"></div>
         <aside class="import-tools">
           <label class="drop-zone" id="fileDrop" for="csvFile">
-            <strong>Drop a NovelFire CSV here</strong>
+            <strong>Drop a reading-list CSV here</strong>
             <span>or click to browse</span>
             <small>Imports create a private draft in this browser.</small>
           </label>
@@ -131,18 +150,19 @@
   </main>
 
   <footer class="site-footer">
-    <div><strong>Novel Phoenix</strong><span>A public, read-only snapshot of one NovelFire library.</span></div>
+    <div><strong>Novel Phoenix</strong><span>A public, read-only snapshot from supported reading sites.</span></div>
     <nav aria-label="Legal and project links">
       <a href="./privacy.html">Privacy</a>
       <a href="./terms.html">Terms</a>
       <a href="./accessibility.html">Accessibility</a>
       <a href="./security.html">Security</a>
+      <a href="./feed.xml">Reading history feed</a>
       <a href="https://github.com/adeelone/myReadList" target="_blank" rel="noopener noreferrer" referrerpolicy="no-referrer">Source</a>
     </nav>
-    <small>&copy; 2026 Novel Phoenix. Not affiliated with NovelFire.</small>
+    <small>&copy; 2026 Novel Phoenix. Not affiliated with NovelFire or NovelPhoenix.com.</small>
   </footer>
 
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
-  <script type="module" src="./app.js?v=2.1.0"></script>
+  <script type="module" src="./app.js?v=2.2.0"></script>
 </body>
 </html>

@@ -3,7 +3,7 @@ import { fileURLToPath } from "node:url";
 import path from "node:path";
 
 // novelfire-readlist.js (the bookmarklet) is the single source of truth for the
-// NovelFire extraction logic. novelfire-readlist.user.js (the Tampermonkey build)
+// multi-site extraction logic. novelfire-readlist.user.js (the Tampermonkey build)
 // wraps the exact same body in a named function plus a floating launcher button,
 // so it is generated from the bookmarklet source instead of hand-duplicated.
 
@@ -14,9 +14,10 @@ const targetPath = path.join(root, "novelfire-readlist.user.js");
 const HEADER = `// ==UserScript==
 // @name         Novel Phoenix Exporter
 // @namespace    local.myReadList
-// @version      2.0.0
-// @description  Collect library entries across all NovelFire pages, including authors and reading progress.
+// @version      2.2.0
+// @description  Export signed-in NovelFire and NovelPhoenix.com libraries with authors, links, and reading progress.
 // @match        https://novelfire.net/account/library*
+// @match        https://novelphoenix.com/*
 // @grant        none
 // ==/UserScript==
 
@@ -32,7 +33,7 @@ const FOOTER = `  };
     if (document.getElementById("nf-readlist-launcher")) return;
     const button = document.createElement("button");
     button.id = "nf-readlist-launcher";
-    button.textContent = "Export to Novel Phoenix";
+    button.textContent = "Export reading list";
     button.style.cssText = ["position:fixed", "right:20px", "bottom:20px", "z-index:2147483646", "padding:12px 16px", "border:0", "border-radius:999px", "background:#2563eb", "color:#fff", "font:600 14px system-ui,sans-serif", "cursor:pointer", "box-shadow:0 12px 30px rgba(0,0,0,.3)"].join(";");
     button.addEventListener("click", runExtractor);
     document.body.appendChild(button);

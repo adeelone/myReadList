@@ -1,0 +1,26 @@
+# Novel Phoenix
+
+> Novel Phoenix is a public, read-only reading library showing novel names, chapter progress, direct reading links, and snapshot history from NovelFire and NovelPhoenix.com exports.
+
+Canonical site: https://novel-phoenix-readlist.vercel.app/
+Source: https://github.com/adeelone/myReadList
+
+## Primary pages
+
+- [Library](https://novel-phoenix-readlist.vercel.app/): Current public reading snapshot.
+- [Privacy](https://novel-phoenix-readlist.vercel.app/privacy): Data-handling policy.
+- [Terms](https://novel-phoenix-readlist.vercel.app/terms): Terms of use and third-party boundaries.
+- [Accessibility](https://novel-phoenix-readlist.vercel.app/accessibility): Accessibility statement.
+- [Security](https://novel-phoenix-readlist.vercel.app/security): Security posture and private reporting route.
+- [Reading history feed](https://novel-phoenix-readlist.vercel.app/feed.xml): Atom feed of forward reading-progress events.
+
+## Full context
+
+- [llms-full.txt](https://novel-phoenix-readlist.vercel.app/llms-full.txt): Expanded project context in a single file.
+
+## Data notes
+
+- Public snapshot: 110 novels and 38,118 chapters read as of August 12, 2026.
+- Novel and chapter links point to their third-party NovelFire or NovelPhoenix.com source pages.
+- The legacy snapshot does not contain a trustworthy chronological last-read order.
+- Browser CSV imports remain local until the owner deliberately publishes a sanitized snapshot through Git.

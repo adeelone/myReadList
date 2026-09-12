@@ -1,7 +1,7 @@
 {
   "name": "Novel Phoenix",
   "short_name": "Novel Phoenix",
-  "description": "A public reading library with current progress and reading history.",
+  "description": "A public reading library from NovelFire and NovelPhoenix.com with chapter progress and reading history.",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",

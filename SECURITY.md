@@ -2,7 +2,7 @@
 
 ## Supported version
 
-The deployed `main` branch is the only supported version. Security fixes are released to the live GitHub Pages site after review and automated checks.
+The deployed `main` branch is the only supported version. Security fixes are released to the Vercel production site after review and automated checks; GitHub Pages remains a fallback deployment.
 
 ## Report privately
 
@@ -20,7 +20,7 @@ Do not include real credentials, session cookies, private reading exports, or un
 
 ## Safe-harbor expectations
 
-Good-faith research is welcome when it avoids privacy violations, service disruption, social engineering, automated traffic that burdens GitHub or NovelFire, persistence, and destruction or alteration of data. Stop testing and report immediately if you encounter non-public information.
+Good-faith research is welcome when it avoids privacy violations, service disruption, social engineering, automated traffic that burdens Vercel, GitHub, NovelFire, or NovelPhoenix.com, persistence, and destruction or alteration of data. Stop testing and report immediately if you encounter non-public information.
 
 ## Architecture and boundaries
 

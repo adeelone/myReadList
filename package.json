@@ -1,9 +1,9 @@
 {
-  "name": "novel-phoenix",
-  "version": "2.1.0",
+  "name": "novel-phoenix-readlist",
+  "version": "2.2.0",
   "private": true,
   "type": "module",
-  "description": "A public NovelFire reading library, progress tracker, and history.",
+  "description": "A public NovelFire and NovelPhoenix.com reading library, progress tracker, and history.",
   "engines": {
     "node": ">=20"
   },
@@ -11,7 +11,7 @@
     "dev": "node scripts/serve.mjs",
     "test": "node tests/run.mjs",
     "build": "node scripts/build.mjs",
-    "check": "npm test && npm run build && node --check novelfire-readlist.js && node --check novelfire-readlist.user.js && node scripts/generate-readlist.mjs --check && node scripts/bookmarklet.mjs --check",
+    "check": "npm test && npm run build && node tests/audit-dist.mjs && node --check novelfire-readlist.js && node --check novelfire-readlist.user.js && node scripts/generate-readlist.mjs --check && node scripts/bookmarklet.mjs --check",
     "generate": "node scripts/generate-readlist.mjs && node scripts/bookmarklet.mjs",
     "bookmarklet": "node scripts/bookmarklet.mjs",
     "ingest": "node scripts/ingest.mjs",
